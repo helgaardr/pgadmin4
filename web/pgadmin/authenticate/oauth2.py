@@ -70,8 +70,12 @@ def init_app(app):
     @pgCSRFProtect.exempt
     def oauth_logout():
         logout_url = None
+        id_token = None
+        
         if 'oauth2_logout_url' in session:
             logout_url = session['oauth2_logout_url']
+        if 'oauth2_token' in session:
+            id_token = session['oauth2_token'].get('id_token')
 
         if not current_user.is_authenticated:
             return redirect(get_safe_post_logout_redirect())
@@ -80,7 +84,6 @@ def init_app(app):
 
         logout_user()
         if logout_url:
-            id_token = session['oauth2_token'].get('id_token')
             return redirect(logout_url.format(
                 redirect_uri=request.url_root,
                 id_token=id_token))
